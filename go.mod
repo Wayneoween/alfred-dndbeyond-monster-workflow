@@ -1,4 +1,4 @@
-module github.com/Wayneoween/alfred_ddb
+module github.com/Wayneoween/alfred-dndbeyond-monster-workflow
 
 go 1.12
 
