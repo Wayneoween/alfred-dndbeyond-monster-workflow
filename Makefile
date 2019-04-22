@@ -4,6 +4,7 @@ release: clean build pack copy
 
 clean:
 	$(RM) alfred-dndbeyond-monster-workflow
+	$(RM) alfred-dndbeyond-monster-workflow.upx
 
 build:
 	go build -ldflags="-s -w" alfred-dndbeyond-monster-workflow.go
