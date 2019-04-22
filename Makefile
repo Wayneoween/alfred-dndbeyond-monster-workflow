@@ -1,10 +1,15 @@
-all: clean build pack
+all: clean build copy
+
+release: clean build pack copy
 
 clean:
-	$(RM) alfred_ddb
+	$(RM) alfred-dndbeyond-monster-workflow
 
 build:
-	go build -ldflags="-s -w" alfred_ddb.go
+	go build -ldflags="-s -w" alfred-dndbeyond-monster-workflow.go
+
+copy:
+	python2 workflow-install.py
 
 pack:
-	upx --brute alfred_ddb
+	upx --brute alfred-dndbeyond-monster-workflow

@@ -1,6 +1,13 @@
 Changelog
 =========
 
+Version 0.2 – 2019-04-22
+------------------------
+
+### Bugfixes
+
+* [Reduced the workflow file size!](https://github.com/Wayneoween/alfred-dndbeyond-monster-workflow/issues/3)
+
 Version 0.1 – 2019-04-21
 ------------------------
 

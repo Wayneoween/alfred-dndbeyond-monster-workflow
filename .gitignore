@@ -1,3 +1,4 @@
-alfred_ddb
+*.upx
 .DS_Store
+alfred_ddb
 workflow-install.py
