@@ -1,6 +1,13 @@
 Changelog
 =========
 
+Version 0.5 – 2019-04-22
+------------------------
+
+### Features
+
+* [Implement caching algorithm](https://github.com/Wayneoween/alfred-dndbeyond-monster-workflow/issues/2)
+
 Version 0.4 – 2019-04-22
 ------------------------
 
