@@ -1,4 +1,5 @@
 *.upx
 .DS_Store
 alfred_ddb
+alfred-dndbeyond-monster-workflow
 workflow-install.py
