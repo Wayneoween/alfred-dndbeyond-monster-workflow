@@ -13,6 +13,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strings"
 
 	aw "github.com/deanishe/awgo"
 	"github.com/deanishe/awgo/update"
@@ -24,18 +25,41 @@ import (
 const updateJobName = "checkForUpdate"
 
 var (
-	doCheck       bool
-	baseurl       = "https://www.dndbeyond.com"
-	helpURL       = "https://marius-schuller.de"
-	maxResults    = 10
-	url           = baseurl + "/search?f=monsters&c=monsters&q=" // ddb search url
-	iconAvailable = &aw.Icon{Value: "update-available.png"}
-	repo          = "Wayneoween/alfred-dndbeyond-monster-workflow" // GitHub repo
-	wf            *aw.Workflow                                     // Our Workflow object
+	doCheck     bool
+	baseurl     = "https://www.dndbeyond.com"
+	iconbaseurl = "https://www.dndbeyond.com/Content/1-0-244-0/Skins/Waterdeep/images/icons/monsters/"
+	helpURL     = "https://marius-schuller.de"
+	maxResults  = 10
+	url         = baseurl + "/monsters?filter-search="           // ddb search url
+	repo        = "Wayneoween/alfred-dndbeyond-monster-workflow" // GitHub repo
+	wf          *aw.Workflow                                     // Our Workflow object
+
+	// Icons
+	updateAvailable = &aw.Icon{Value: "icons/update-available.png"}
+	// Monster Type Icons
+	monsterIconDefault       = &aw.Icon{Value: "icons/dnd/default.png"}
+	monsterIconAbberations   = &aw.Icon{Value: "icons/dnd/aberration.jpg"}
+	monsterIconBeasts        = &aw.Icon{Value: "icons/dnd/beast.jpg"}
+	monsterIconCelestials    = &aw.Icon{Value: "icons/dnd/celestial.jpg"}
+	monsterIconConstructs    = &aw.Icon{Value: "icons/dnd/construct.jpg"}
+	monsterIconDragons       = &aw.Icon{Value: "icons/dnd/dragon.jpg"}
+	monsterIconElementals    = &aw.Icon{Value: "icons/dnd/elemental.jpg"}
+	monsterIconFey           = &aw.Icon{Value: "icons/dnd/fey.jpg"}
+	monsterIconFiends        = &aw.Icon{Value: "icons/dnd/fiend.jpg"}
+	monsterIconGiants        = &aw.Icon{Value: "icons/dnd/giant.jpg"}
+	monsterIconHumanoids     = &aw.Icon{Value: "icons/dnd/humanoid.jpg"}
+	monsterIconMonstrosities = &aw.Icon{Value: "icons/dnd/monstrosity.jpg"}
+	monsterIconOozes         = &aw.Icon{Value: "icons/dnd/ooze.jpg"}
+	monsterIconPlants        = &aw.Icon{Value: "icons/dnd/plant.jpg"}
+	monsterIconUndead        = &aw.Icon{Value: "icons/dnd/undead.jpg"}
 )
 
 type monster struct {
+	MonsterCR   string
+	MonsterIcon *aw.Icon
 	MonsterName string
+	MonsterSize string
+	MonsterType string
 	MonsterURL  string
 }
 
@@ -95,7 +119,7 @@ func run() {
 			Subtitle("↩ to install").
 			Autocomplete("workflow:update").
 			Valid(false).
-			Icon(iconAvailable)
+			Icon(updateAvailable)
 	}
 
 	log.Printf("[main] query=%s", query)
@@ -107,19 +131,70 @@ func run() {
 		colly.Async(true),
 	)
 
+	// randomize the user agent colly uses
 	extensions.RandomUserAgent(c)
 
-	c.OnHTML(".ddb-search-results-listing-item-header-primary-text", func(e *colly.HTMLElement) {
+	// on every node with class="info"
+	c.OnHTML(".info", func(e *colly.HTMLElement) {
 		temp := monster{}
-		temp.MonsterName = e.ChildText("a")
-		temp.MonsterURL = e.ChildAttr("a", "href")
+		temp.MonsterCR = e.ChildText(".monster-challenge")
+		temp.MonsterType = e.ChildText(".type")
+		// for now we use a generic icon for the monster type
+		switch strings.ToLower(temp.MonsterType) {
+		case "aberration":
+			temp.MonsterIcon = monsterIconAbberations
+		case "beast":
+			temp.MonsterIcon = monsterIconBeasts
+		case "celestial":
+			temp.MonsterIcon = monsterIconCelestials
+		case "construct":
+			temp.MonsterIcon = monsterIconConstructs
+		case "dragon":
+			temp.MonsterIcon = monsterIconDragons
+		case "elemental":
+			temp.MonsterIcon = monsterIconElementals
+		case "fey":
+			temp.MonsterIcon = monsterIconFey
+		case "fiend":
+			temp.MonsterIcon = monsterIconFiends
+		case "giant":
+			temp.MonsterIcon = monsterIconGiants
+		case "humanoid":
+			temp.MonsterIcon = monsterIconHumanoids
+		case "monstrosity":
+			temp.MonsterIcon = monsterIconMonstrosities
+		case "ooze":
+			temp.MonsterIcon = monsterIconOozes
+		case "plant":
+			temp.MonsterIcon = monsterIconPlants
+		case "undead":
+			temp.MonsterIcon = monsterIconUndead
+		default:
+			temp.MonsterIcon = monsterIconDefault
+		}
+		temp.MonsterName = e.ChildText(".name")
+		temp.MonsterSize = e.ChildText(".monster-size")
+		temp.MonsterURL = e.ChildAttr(".name .link", "href")
 		monsters = append(monsters, temp)
-		wf.NewItem(temp.MonsterName).Subtitle(baseurl + temp.MonsterURL).Arg(baseurl + temp.MonsterURL).UID(temp.MonsterName + temp.MonsterURL).Valid(true)
-		log.Println("MonsterName ", temp.MonsterName)
-		log.Println("MonsterURL ", baseurl+temp.MonsterURL)
+
+		wf.NewItem(temp.MonsterName).
+			Subtitle("CR " + temp.MonsterCR + " - " + temp.MonsterSize + " - " + temp.MonsterType).
+			Icon(temp.MonsterIcon).
+			Arg(baseurl + temp.MonsterURL).
+			UID(temp.MonsterName + temp.MonsterURL).
+			Valid(true)
+
+		log.Println("MonsterCR:   ", temp.MonsterCR)
+		log.Println("MonsterIcon: ", temp.MonsterIcon)
+		log.Println("MonsterName: ", temp.MonsterName)
+		log.Println("MonsterType: ", temp.MonsterType)
+		log.Println("MonsterSize: ", temp.MonsterSize)
+		log.Println("MonsterURL:  ", baseurl+temp.MonsterURL)
+		log.Println("-------------------------------------------------")
 	})
 
 	c.Visit(url + query)
+	log.Println("Visiting ", url+query)
 
 	c.Wait()
 

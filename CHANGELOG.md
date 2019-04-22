@@ -1,17 +1,24 @@
 Changelog
 =========
 
+Version 0.4 – 2019-04-22
+------------------------
+
+### Features
+
+* [Implement generic monster type images](https://github.com/Wayneoween/alfred-dndbeyond-monster-workflow/issues/5)
+
 Version 0.3 – 2019-04-22
 ------------------------
 
-### Bugfixes
+### Features
 
 * [Implement Auto-Update](https://github.com/Wayneoween/alfred-dndbeyond-monster-workflow/issues/4)
 
 Version 0.2 – 2019-04-22
 ------------------------
 
-### Bugfixes
+### Features
 
 * [Reduced the workflow file size!](https://github.com/Wayneoween/alfred-dndbeyond-monster-workflow/issues/3)
 
