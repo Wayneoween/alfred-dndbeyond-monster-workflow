@@ -1,6 +1,13 @@
 Changelog
 =========
 
+Version 0.3 – 2019-04-22
+------------------------
+
+### Bugfixes
+
+* [Implement Auto-Update](https://github.com/Wayneoween/alfred-dndbeyond-monster-workflow/issues/4)
+
 Version 0.2 – 2019-04-22
 ------------------------
 
