@@ -7,7 +7,7 @@ You don't need to login but you might end up on a monster page you can't see bec
 
 **[DOWNLOAD](https://github.com/Wayneoween/alfred-dndbeyond-monster-workflow/releases)**
 
-![Workflow Screenshot](screenshot.png)
+![Demo GIF](demo.gif)
 
 Development
 -----------
@@ -28,3 +28,5 @@ Development workflow is like this:
 2. `python2 workflow-install.py`
 3. Test changes in Alfred
 4. Repeat
+
+![Workflow Screenshot](screenshot.png)

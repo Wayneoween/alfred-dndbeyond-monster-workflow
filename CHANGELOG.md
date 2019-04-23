@@ -1,6 +1,16 @@
 Changelog
 =========
 
+Version 0.5.1 – 2019-04-23
+------------------------
+
+### Maintenance
+
+* Better comments
+* Better logging
+* Set an Alfred Placeholder and Subtext
+* Added gif as screenshot
+
 Version 0.5 – 2019-04-22
 ------------------------
 

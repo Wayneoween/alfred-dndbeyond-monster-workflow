@@ -80,12 +80,13 @@ func init() {
 		update.GitHub(repo),
 	)
 
-	// Do I need this?
+	// Add a commandline flag to the binary so that the updateCheck can call it
 	flag.BoolVar(&doCheck, "check", false, "check for a new version")
 }
 
 func run() {
 	var query string
+	monsters := []*monster{}
 
 	wf.Args() // call to handle magic actions
 	flag.Parse()
@@ -96,14 +97,14 @@ func run() {
 	}
 
 	// Try to load cached monsters
-	monsters := []*monster{}
-	log.Println("monsters before cache load: ", monsters)
 	if wf.Cache.Exists(query + "_" + cacheName) {
+		log.Println("Data is being loaded from cache.")
+		log.Println("monsters before cache load: ", monsters)
 		if err := wf.Cache.LoadJSON(query+"_"+cacheName, &monsters); err != nil {
 			wf.FatalError(err)
 		}
+		log.Println("monsters after cache load: ", monsters)
 	}
-	log.Println("monsters after cache load: ", monsters)
 
 	if doCheck {
 		wf.Configure(aw.TextErrors(true))
@@ -148,6 +149,8 @@ func run() {
 	log.Printf("[main] query=%s", query)
 
 	if wf.Cache.Expired(query+"_"+cacheName, maxCacheAge) {
+		log.Println("Data is being loaded from website.")
+
 		// Instantiate default colly collector
 		c := colly.NewCollector(
 			// Visit only domains: old.reddit.com
@@ -211,13 +214,16 @@ func run() {
 		})
 
 		log.Println("Visiting ", url+query)
+		// load the website
 		c.Visit(url + query)
+		// wait until the callbacks finished working
 		c.Wait()
 
+		// print the monster array
 		log.Println(monsters)
 
+		// write cache only if we have at least one monster
 		if len(monsters) != 0 {
-			// write cache only if we have new data
 			wf.Configure(aw.TextErrors(true))
 			if err := wf.Cache.StoreJSON(query+"_"+cacheName, monsters); err != nil {
 				wf.FatalError(err)
@@ -229,7 +235,7 @@ func run() {
 	if len(monsters) == 0 {
 		wf.WarnEmpty("Nothing found.", "Try another name.")
 	} else {
-		// no matter if via internet or from the cache, send all entries to alfred
+		// no matter if via internet or from the cache, add all monsters as items for alfred
 		for _, temp := range monsters {
 			wf.NewItem(temp.MonsterName).
 				Subtitle("CR " + temp.MonsterCR + " - " + temp.MonsterSize + " - " + temp.MonsterType).
