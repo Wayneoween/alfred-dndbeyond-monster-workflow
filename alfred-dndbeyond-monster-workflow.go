@@ -11,6 +11,7 @@ package main
 import (
 	"flag"
 	"log"
+	"net/url"
 	"os"
 	"os/exec"
 	"strings"
@@ -31,7 +32,7 @@ var (
 	baseurl    = "https://www.dndbeyond.com"
 	helpURL    = "https://marius-schuller.de"
 	maxResults = 20
-	url        = baseurl + "/monsters?filter-search=" // ddb search url
+	mainURL    = baseurl + "/monsters?filter-search=" // ddb search url
 
 	// updatecheck variable
 	doCheck bool
@@ -148,7 +149,7 @@ func run() {
 
 	log.Printf("[main] query=%s", query)
 
-	if wf.Cache.Expired(query+"_"+cacheName, maxCacheAge) {
+	if wf.Cache.Expired(strings.Replace(query, " ", "-", -1)+"_"+cacheName, maxCacheAge) {
 		log.Println("Data is being loaded from website.")
 
 		// Instantiate default colly collector
@@ -213,9 +214,9 @@ func run() {
 			log.Println("-------------------------------------------------")
 		})
 
-		log.Println("Visiting ", url+query)
+		log.Println("Visiting ", mainURL+url.QueryEscape(query))
 		// load the website
-		c.Visit(url + query)
+		c.Visit(mainURL + url.QueryEscape(query))
 		// wait until the callbacks finished working
 		c.Wait()
 
@@ -225,7 +226,7 @@ func run() {
 		// write cache only if we have at least one monster
 		if len(monsters) != 0 {
 			wf.Configure(aw.TextErrors(true))
-			if err := wf.Cache.StoreJSON(query+"_"+cacheName, monsters); err != nil {
+			if err := wf.Cache.StoreJSON(strings.Replace(query, " ", "-", -1)+"_"+cacheName, monsters); err != nil {
 				wf.FatalError(err)
 			}
 		}
