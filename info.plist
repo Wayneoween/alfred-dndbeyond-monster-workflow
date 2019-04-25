@@ -103,6 +103,14 @@
 	<string>Changelog
 =========
 
+Version 0.5.2 – 2019-04-25
+------------------------
+
+### Bugfix
+
+* [Spaces in Monster names not recognized](https://github.com/Wayneoween/alfred-dndbeyond-monster-workflow/issues/7)
+
+
 Version 0.5.1 – 2019-04-23
 ------------------------
 
@@ -171,7 +179,7 @@ Initial release \o/
 		</dict>
 	</dict>
 	<key>version</key>
-	<string>0.5.1</string>
+	<string>0.5.2</string>
 	<key>webaddress</key>
 	<string>https://marius-schuller.de</string>
 </dict>
