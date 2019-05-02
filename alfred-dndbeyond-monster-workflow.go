@@ -9,67 +9,46 @@ Pressing Enter on each entry uses the default browser to open the monster page o
 package main
 
 import (
+	"encoding/json"
 	"flag"
+	"fmt"
+	"io/ioutil"
 	"log"
-	"net/url"
+	"net/http"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"time"
 
 	aw "github.com/deanishe/awgo"
 	"github.com/deanishe/awgo/update"
-	"github.com/gocolly/colly"
-	"github.com/gocolly/colly/extensions"
 )
 
 // Name of the background job that checks for updates
 const updateJobName = "checkForUpdate"
 
 var (
-	// base variables
-	wf         *aw.Workflow // Our Workflow object
-	baseurl    = "https://www.dndbeyond.com"
-	helpURL    = "https://marius-schuller.de"
-	maxResults = 20
-	mainURL    = baseurl + "/monsters?filter-search=" // ddb search url
+	// awgo specific variable
+	wf *aw.Workflow // Our Workflow object
 
-	// updatecheck variable
-	doCheck bool
-	repo    = "Wayneoween/alfred-dndbeyond-monster-workflow" // GitHub repo
+	// base variables
+	query         string
+	baseurl       = "https://www.dnddeutsch.de/tools/json.php?o=monster&q="
+	helpURL       = "https://github.com/" + repo
+	maxResults    = 50
+	doTranslateDE bool
+
+	// commandline flags
+	doCheck     bool
+	doTranslate bool
+	// updateCheck target
+	repo = "Wayneoween/alfred-dndbeyond-monster-workflow" // GitHub repo
 
 	// cache variables
 	cacheName   = "monsters.json"           // Filename of cached repo list
 	maxCacheAge = 7 * 24 * 60 * time.Minute // Cache each query for 7 days
-
-	// Icons
-	updateAvailable = &aw.Icon{Value: "icons/update-available.png"}
-	// monster Type Icons
-	monsterIconDefault       = &aw.Icon{Value: "icons/dnd/default.png"}
-	monsterIconAbberations   = &aw.Icon{Value: "icons/dnd/aberration.jpg"}
-	monsterIconBeasts        = &aw.Icon{Value: "icons/dnd/beast.jpg"}
-	monsterIconCelestials    = &aw.Icon{Value: "icons/dnd/celestial.jpg"}
-	monsterIconConstructs    = &aw.Icon{Value: "icons/dnd/construct.jpg"}
-	monsterIconDragons       = &aw.Icon{Value: "icons/dnd/dragon.jpg"}
-	monsterIconElementals    = &aw.Icon{Value: "icons/dnd/elemental.jpg"}
-	monsterIconFey           = &aw.Icon{Value: "icons/dnd/fey.jpg"}
-	monsterIconFiends        = &aw.Icon{Value: "icons/dnd/fiend.jpg"}
-	monsterIconGiants        = &aw.Icon{Value: "icons/dnd/giant.jpg"}
-	monsterIconHumanoids     = &aw.Icon{Value: "icons/dnd/humanoid.jpg"}
-	monsterIconMonstrosities = &aw.Icon{Value: "icons/dnd/monstrosity.jpg"}
-	monsterIconOozes         = &aw.Icon{Value: "icons/dnd/ooze.jpg"}
-	monsterIconPlants        = &aw.Icon{Value: "icons/dnd/plant.jpg"}
-	monsterIconUndead        = &aw.Icon{Value: "icons/dnd/undead.jpg"}
 )
-
-type monster struct {
-	MonsterCR   string
-	MonsterIcon *aw.Icon
-	MonsterName string
-	MonsterSize string
-	MonsterType string
-	MonsterURL  string
-}
 
 func init() {
 	// Create a new *Workflow using default configuration
@@ -83,14 +62,37 @@ func init() {
 
 	// Add a commandline flag to the binary so that the updateCheck can call it
 	flag.BoolVar(&doCheck, "check", false, "check for a new version")
+	// Add a commandline flag to set the translation
+	flag.BoolVar(&doTranslate, "translate", false, "toggle german translation")
 }
 
 func run() {
-	var query string
-	monsters := []*monster{}
+	log.Println("DEBUG: Function 'run'!")
 
 	wf.Args() // call to handle magic actions
 	flag.Parse()
+
+	monsters := []*Monster{}
+	doTranslateDE := wf.Config.GetBool("translate", false)
+
+	log.Println("DEBUG: doTranslateDE=" + strconv.FormatBool(doTranslateDE))
+
+	if doTranslate {
+		log.Printf("Toggline translate from %s to %s.", strconv.FormatBool(doTranslateDE), strconv.FormatBool(!doTranslateDE))
+		wf.Configure(aw.TextErrors(true))
+		wf.NewItem(fmt.Sprintf("Set %s to “%s”", "translate", strconv.FormatBool(doTranslateDE))).
+			Subtitle("↩ to save").
+			Arg(strconv.FormatBool(doTranslateDE)).
+			Valid(true).
+			Var("value", strconv.FormatBool(doTranslateDE)).
+			Var("varname", "translate")
+
+		if err := wf.Config.Set("translate", strconv.FormatBool(!doTranslateDE), false, wf.BundleID()).Do(); err != nil {
+			wf.FatalError(err)
+		}
+
+		return
+	}
 
 	// Use wf.Args() to enable Magic Actions
 	if args := wf.Args(); len(args) > 0 {
@@ -144,7 +146,7 @@ func run() {
 			Subtitle("↩ to install").
 			Autocomplete("workflow:update").
 			Valid(false).
-			Icon(updateAvailable)
+			Icon(UpdateAvailable)
 	}
 
 	log.Printf("[main] query=%s", query)
@@ -152,79 +154,61 @@ func run() {
 	if wf.Cache.Expired(strings.Replace(query, " ", "-", -1)+"_"+cacheName, maxCacheAge) {
 		log.Println("Data is being loaded from website.")
 
-		// Instantiate default colly collector
-		c := colly.NewCollector(
-			// Visit only domains: old.reddit.com
-			colly.AllowURLRevisit(),
-			colly.Async(true),
-		)
+		var resultSet D3ResultSet
 
-		// randomize the user agent colly uses
-		extensions.RandomUserAgent(c)
+		log.Println("Loading data from " + baseurl + query)
+		response, err := http.Get(baseurl + query)
+		if err != nil {
+			fmt.Print(err.Error())
+		}
 
-		// on every node with class="info"
-		c.OnHTML(".info", func(e *colly.HTMLElement) {
-			temp := new(monster)
-			temp.MonsterCR = e.ChildText(".monster-challenge")
-			temp.MonsterType = e.ChildText(".type")
-			// for now we use a generic icon for the monster type
-			switch strings.ToLower(temp.MonsterType) {
-			case "aberration":
-				temp.MonsterIcon = monsterIconAbberations
-			case "beast":
-				temp.MonsterIcon = monsterIconBeasts
-			case "celestial":
-				temp.MonsterIcon = monsterIconCelestials
-			case "construct":
-				temp.MonsterIcon = monsterIconConstructs
-			case "dragon":
-				temp.MonsterIcon = monsterIconDragons
-			case "elemental":
-				temp.MonsterIcon = monsterIconElementals
-			case "fey":
-				temp.MonsterIcon = monsterIconFey
-			case "fiend":
-				temp.MonsterIcon = monsterIconFiends
-			case "giant":
-				temp.MonsterIcon = monsterIconGiants
-			case "humanoid":
-				temp.MonsterIcon = monsterIconHumanoids
-			case "monstrosity":
-				temp.MonsterIcon = monsterIconMonstrosities
-			case "ooze":
-				temp.MonsterIcon = monsterIconOozes
-			case "plant":
-				temp.MonsterIcon = monsterIconPlants
-			case "undead":
-				temp.MonsterIcon = monsterIconUndead
-			default:
-				temp.MonsterIcon = monsterIconDefault
+		defer response.Body.Close()
+
+		responseData, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		log.Printf("responseData: %s", responseData)
+
+		// unmarshall the JSON response into resultSet
+		json.Unmarshal(responseData, &resultSet)
+
+		log.Printf("DEBUG: unmarshalled data:")
+		log.Println(resultSet)
+
+		// if there are results in the monsterarray for our query
+		if len(resultSet.Monster) > 0 {
+			log.Printf("DEBUG: %d Monsters were found!", len(resultSet.Monster))
+
+			// range over the array and create entries for every one of them
+			log.Println("DEBUG: Printing each monster:")
+			for _, result := range resultSet.Monster {
+
+				if len(result.Size) > 0 && len(result.Type) > 0 {
+					// add the result fields to temp Monster
+					temp := result
+
+					log.Println("MonsterCR:     ", temp.Cr)
+					log.Println("MonsterName:   ", temp.NameDE)
+					log.Println("MonsterType:   ", temp.Type)
+					log.Println("MonsterSize:   ", temp.Size)
+					log.Println("-------------------------------------------------")
+
+					monsters = append(monsters, &temp)
+				} else {
+					log.Println("Not a real monster entry. Skipping.")
+					log.Println(result)
+				}
 			}
-			temp.MonsterName = e.ChildText(".name")
-			temp.MonsterSize = e.ChildText(".monster-size")
-			temp.MonsterURL = e.ChildAttr(".name .link", "href")
-			monsters = append(monsters, temp)
-
-			log.Println("MonsterCR:   ", temp.MonsterCR)
-			log.Println("MonsterIcon: ", temp.MonsterIcon)
-			log.Println("MonsterName: ", temp.MonsterName)
-			log.Println("MonsterType: ", temp.MonsterType)
-			log.Println("MonsterSize: ", temp.MonsterSize)
-			log.Println("MonsterURL:  ", baseurl+temp.MonsterURL)
-			log.Println("-------------------------------------------------")
-		})
-
-		log.Println("Visiting ", mainURL+url.QueryEscape(query))
-		// load the website
-		c.Visit(mainURL + url.QueryEscape(query))
-		// wait until the callbacks finished working
-		c.Wait()
+		}
 
 		// print the monster array
 		log.Println(monsters)
 
 		// write cache only if we have at least one monster
 		if len(monsters) != 0 {
+			log.Println("More than 1 monsters found. Caching...")
 			wf.Configure(aw.TextErrors(true))
 			if err := wf.Cache.StoreJSON(strings.Replace(query, " ", "-", -1)+"_"+cacheName, monsters); err != nil {
 				wf.FatalError(err)
@@ -234,16 +218,46 @@ func run() {
 
 	// if there are no monsters just send the warning.
 	if len(monsters) == 0 {
-		wf.WarnEmpty("Nothing found.", "Try another name.")
+		if doTranslateDE {
+			wf.WarnEmpty("Leider nichts gefunden.", "Versuche einen anderen Namen.")
+		} else {
+			wf.WarnEmpty("Nothing found.", "Try another name.")
+		}
 	} else {
 		// no matter if via internet or from the cache, add all monsters as items for alfred
 		for _, temp := range monsters {
-			wf.NewItem(temp.MonsterName).
-				Subtitle("CR " + temp.MonsterCR + " - " + temp.MonsterSize + " - " + temp.MonsterType).
-				Icon(temp.MonsterIcon).
-				Arg(baseurl + temp.MonsterURL).
-				UID(temp.MonsterName + temp.MonsterURL).
-				Valid(true)
+
+			if doTranslateDE {
+				var titleDE string
+				var subtitleDE string
+				// if DE name and EN name are the same OR if DE name does not exist, use EN name
+				if temp.NameDE == temp.NameEN || len(temp.NameDE) == 0 {
+					titleDE = fmt.Sprintf("%s", temp.NameEN)
+				} else {
+					titleDE = fmt.Sprintf("%s - %s", temp.NameDE, temp.NameEN)
+				}
+				if temp.PageDE == "0" {
+					subtitleDE = fmt.Sprintf("CR %s - %s - %s - %s %s(en)", temp.Cr, temp.Size, temp.Type, temp.Src, temp.PageEN)
+				} else {
+					subtitleDE = fmt.Sprintf("CR %s - %s - %s - %s %s(de) %s(en)", temp.Cr, temp.Size, temp.Type, temp.Src, temp.PageDE, temp.PageEN)
+				}
+				wf.NewItem(titleDE).
+					Subtitle(subtitleDE).
+					Icon(getIconForType(temp.Type)).
+					Arg("https://www.dndbeyond.com/monsters/" + strings.Replace(strings.ToLower(temp.NameEN), " ", "-", -1)).
+					UID(temp.NameEN + temp.SingleLine).
+					Valid(true)
+			} else {
+				titleEN := fmt.Sprintf("%s", temp.NameEN)
+				subtitleEN := fmt.Sprintf("CR %s - %s - %s - %s %s", temp.Cr, temp.Size, temp.Type, temp.Src, temp.PageEN)
+				wf.NewItem(titleEN).
+					Subtitle(subtitleEN).
+					Icon(getIconForType(temp.Type)).
+					Arg("https://www.dndbeyond.com/monsters/" + strings.Replace(strings.ToLower(temp.NameEN), " ", "-", -1)).
+					UID(temp.NameEN + temp.SingleLine).
+					Valid(true)
+			}
+
 		}
 	}
 
@@ -255,4 +269,5 @@ func main() {
 	// Wrap your entry point with Run() to catch and log panics and
 	// show an error in Alfred instead of silently dying
 	wf.Run(run)
+	fmt.Println("")
 }

@@ -1,6 +1,21 @@
 Changelog
 =========
 
+Version 0.6 – 2019-05-01
+------------------------
+
+### Bugfix
+
+* [reduce API calls by 50% by only using dnddeutsch.de](https://github.com/Wayneoween/alfred-dndbeyond-monster-workflow/issues/8)
+* [add option to translate monster names](https://github.com/Wayneoween/alfred-dndbeyond-monster-workflow/issues/6)
+
+Version 0.5.2 – 2019-04-25
+------------------------
+
+### Bugfix
+
+* [Spaces in Monster names not recognized](https://github.com/Wayneoween/alfred-dndbeyond-monster-workflow/issues/7)
+
 Version 0.5.1 – 2019-04-23
 ------------------------
 

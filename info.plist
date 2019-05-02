@@ -21,6 +21,81 @@
 				<false/>
 			</dict>
 		</array>
+		<key>44009B33-7C34-430E-9969-AE0E1613F360</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>3F321135-CC64-4BD2-AC63-20AC2AD910A6</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>46180B2B-73E1-426C-8AA8-45D44AA454A1</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>5C742A1C-1F3F-474A-AB20-36EB2C26FE77</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>5C742A1C-1F3F-474A-AB20-36EB2C26FE77</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>44009B33-7C34-430E-9969-AE0E1613F360</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>A5574D74-6BBB-4576-8488-ADDA54B3D087</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>A5574D74-6BBB-4576-8488-ADDA54B3D087</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>8699AF75-DFEB-428B-9C88-C70814E4859C</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>DE97A932-31FD-496F-A0DF-C81660C1EC28</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>46180B2B-73E1-426C-8AA8-45D44AA454A1</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
 	</dict>
 	<key>createdby</key>
 	<string>Marius Schuller</string>
@@ -32,6 +107,25 @@
 	<string>D&amp;DBeyond Monster Search</string>
 	<key>objects</key>
 	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>browser</key>
+				<string></string>
+				<key>spaces</key>
+				<string></string>
+				<key>url</key>
+				<string>{query}</string>
+				<key>utf8</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.openurl</string>
+			<key>uid</key>
+			<string>266449A0-E2B1-4150-8D4D-F6A30501C648</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
 		<dict>
 			<key>config</key>
 			<dict>
@@ -58,9 +152,11 @@
 				<key>runningsubtext</key>
 				<string>Loading...</string>
 				<key>script</key>
-				<string>./alfred-dndbeyond-monster-workflow "$1"</string>
+				<string>QUERY=$(iconv -f UTF8-MAC &lt;&lt;&lt;$'{query}')
+
+./alfred-dndbeyond-monster-workflow $QUERY</string>
 				<key>scriptargtype</key>
-				<integer>1</integer>
+				<integer>0</integer>
 				<key>scriptfile</key>
 				<string></string>
 				<key>subtext</key>
@@ -82,19 +178,144 @@
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>browser</key>
-				<string></string>
-				<key>spaces</key>
-				<string></string>
-				<key>url</key>
-				<string>{query}</string>
-				<key>utf8</key>
-				<true/>
+				<key>lastpathcomponent</key>
+				<false/>
+				<key>onlyshowifquerypopulated</key>
+				<false/>
+				<key>removeextension</key>
+				<false/>
+				<key>text</key>
+				<string>Toggled from {var:flag_de} + {var:flag_us}</string>
+				<key>title</key>
+				<string>D&amp;D Monster names now {var:flag_us}</string>
 			</dict>
 			<key>type</key>
-			<string>alfred.workflow.action.openurl</string>
+			<string>alfred.workflow.output.notification</string>
 			<key>uid</key>
-			<string>266449A0-E2B1-4150-8D4D-F6A30501C648</string>
+			<string>3F321135-CC64-4BD2-AC63-20AC2AD910A6</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>inputstring</key>
+				<string>{var:translate}</string>
+				<key>matchcasesensitive</key>
+				<false/>
+				<key>matchmode</key>
+				<integer>0</integer>
+				<key>matchstring</key>
+				<string>false</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.utility.filter</string>
+			<key>uid</key>
+			<string>44009B33-7C34-430E-9969-AE0E1613F360</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string>./alfred-dndbeyond-monster-workflow -translate</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>46180B2B-73E1-426C-8AA8-45D44AA454A1</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>argumenttype</key>
+				<integer>2</integer>
+				<key>keyword</key>
+				<string>ddb translate</string>
+				<key>subtext</key>
+				<string>API and german translation by dnddeutsch.de ❤️</string>
+				<key>text</key>
+				<string>Toggle Translate 🇺🇸/🇩🇪</string>
+				<key>withspace</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.keyword</string>
+			<key>uid</key>
+			<string>DE97A932-31FD-496F-A0DF-C81660C1EC28</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>argument</key>
+				<string></string>
+				<key>variables</key>
+				<dict>
+					<key>flag_de</key>
+					<string>🇩🇪</string>
+					<key>flag_us</key>
+					<string>🇺🇸</string>
+				</dict>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.utility.argument</string>
+			<key>uid</key>
+			<string>5C742A1C-1F3F-474A-AB20-36EB2C26FE77</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>lastpathcomponent</key>
+				<false/>
+				<key>onlyshowifquerypopulated</key>
+				<false/>
+				<key>removeextension</key>
+				<false/>
+				<key>text</key>
+				<string>Toggled from {var:flag_us}</string>
+				<key>title</key>
+				<string>D&amp;D Monster names now {var:flag_de} + {var:flag_us}</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.output.notification</string>
+			<key>uid</key>
+			<string>8699AF75-DFEB-428B-9C88-C70814E4859C</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>inputstring</key>
+				<string>{var:translate}</string>
+				<key>matchcasesensitive</key>
+				<false/>
+				<key>matchmode</key>
+				<integer>0</integer>
+				<key>matchstring</key>
+				<string>true</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.utility.filter</string>
+			<key>uid</key>
+			<string>A5574D74-6BBB-4576-8488-ADDA54B3D087</string>
 			<key>version</key>
 			<integer>1</integer>
 		</dict>
@@ -166,18 +387,76 @@ Initial release \o/
 		<key>1384524C-D4A0-4A11-BCB9-343C1DB7D093</key>
 		<dict>
 			<key>xpos</key>
-			<integer>80</integer>
-			<key>ypos</key>
 			<integer>60</integer>
+			<key>ypos</key>
+			<integer>110</integer>
 		</dict>
 		<key>266449A0-E2B1-4150-8D4D-F6A30501C648</key>
 		<dict>
 			<key>xpos</key>
-			<integer>280</integer>
+			<integer>240</integer>
 			<key>ypos</key>
+			<integer>110</integer>
+		</dict>
+		<key>3F321135-CC64-4BD2-AC63-20AC2AD910A6</key>
+		<dict>
+			<key>xpos</key>
+			<integer>560</integer>
+			<key>ypos</key>
+			<integer>180</integer>
+		</dict>
+		<key>44009B33-7C34-430E-9969-AE0E1613F360</key>
+		<dict>
+			<key>xpos</key>
+			<integer>480</integer>
+			<key>ypos</key>
+			<integer>210</integer>
+		</dict>
+		<key>46180B2B-73E1-426C-8AA8-45D44AA454A1</key>
+		<dict>
+			<key>xpos</key>
+			<integer>240</integer>
+			<key>ypos</key>
+			<integer>250</integer>
+		</dict>
+		<key>5C742A1C-1F3F-474A-AB20-36EB2C26FE77</key>
+		<dict>
+			<key>xpos</key>
+			<integer>390</integer>
+			<key>ypos</key>
+			<integer>280</integer>
+		</dict>
+		<key>8699AF75-DFEB-428B-9C88-C70814E4859C</key>
+		<dict>
+			<key>xpos</key>
+			<integer>560</integer>
+			<key>ypos</key>
+			<integer>310</integer>
+		</dict>
+		<key>A5574D74-6BBB-4576-8488-ADDA54B3D087</key>
+		<dict>
+			<key>xpos</key>
+			<integer>480</integer>
+			<key>ypos</key>
+			<integer>340</integer>
+		</dict>
+		<key>DE97A932-31FD-496F-A0DF-C81660C1EC28</key>
+		<dict>
+			<key>xpos</key>
 			<integer>60</integer>
+			<key>ypos</key>
+			<integer>250</integer>
 		</dict>
 	</dict>
+	<key>variables</key>
+	<dict>
+		<key>translate</key>
+		<string>false</string>
+	</dict>
+	<key>variablesdontexport</key>
+	<array>
+		<string>translate</string>
+	</array>
 	<key>version</key>
 	<string>0.5.2</string>
 	<key>webaddress</key>
