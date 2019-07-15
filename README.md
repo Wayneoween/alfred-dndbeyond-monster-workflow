@@ -1,4 +1,4 @@
-D&DBeyond Workflow for [Alfred 3](http://www.alfredapp.com)
+D&DBeyond Workflow for [Alfred 3 and 4](http://www.alfredapp.com)
 ==============================
 
 You can search monsters on D&DBeyond (`ddb`).
