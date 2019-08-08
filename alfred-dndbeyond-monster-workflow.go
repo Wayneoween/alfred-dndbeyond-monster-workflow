@@ -34,10 +34,13 @@ var (
 
 	// base variables
 	query         string
-	baseurl       = "https://www.dnddeutsch.de/tools/json.php?o=monster&q="
+	finalURL      strings.Builder
+	baseURL       = "https://www.dnddeutsch.de/tools/json.php?o=monster"
 	helpURL       = "https://github.com/" + repo
 	maxResults    = 50
 	doTranslateDE bool
+	includeSrc    = []string{"SRD", "PHB", "DMG", "DMG", "EEPC", "CoS", "GoS", "HotDQ", "MToF", "OotA", "PotA", "RoT", "SCAG", "SKT", "ToA", "VGM", "WDH", "WDMM", "BGDiA", "GGtR", "LMoP", "XGE", "TYP", "ESSENTIAL"}
+	srcString     = strings.Join(includeSrc, "&src=")
 
 	// commandline flags
 	doCheck     bool
@@ -51,6 +54,16 @@ var (
 )
 
 func init() {
+
+	// start building the API URL to access
+	finalURL.WriteString(baseURL)
+	for _, src := range includeSrc {
+		// add all the sources
+		finalURL.WriteString("&src[]=")
+		finalURL.WriteString(src)
+	}
+	finalURL.WriteString("&q=")
+
 	// Create a new *Workflow using default configuration
 	// (workflow settings are read from the environment variables
 	// set by Alfred)
@@ -156,8 +169,8 @@ func run() {
 
 		var resultSet D3ResultSet
 
-		log.Println("Loading data from " + baseurl + query)
-		response, err := http.Get(baseurl + query)
+		log.Println("Loading data from " + finalURL.String() + query)
+		response, err := http.Get(finalURL.String() + query)
 		if err != nil {
 			fmt.Print(err.Error())
 		}
