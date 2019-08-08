@@ -133,6 +133,8 @@
 				<false/>
 				<key>alfredfiltersresultsmatchmode</key>
 				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
 				<key>argumenttrimmode</key>
 				<integer>0</integer>
 				<key>argumenttype</key>
@@ -173,7 +175,7 @@
 			<key>uid</key>
 			<string>1384524C-D4A0-4A11-BCB9-343C1DB7D093</string>
 			<key>version</key>
-			<integer>2</integer>
+			<integer>3</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -324,6 +326,13 @@
 	<string>Changelog
 =========
 
+Version 0.6.1 – 2019-08-08
+------------------------
+
+### Bugfix
+
+* Pin monster sources to the official WotC source books
+
 Version 0.6 – 2019-05-01
 ------------------------
 
@@ -466,7 +475,7 @@ Initial release \o/
 		<string>translate</string>
 	</array>
 	<key>version</key>
-	<string>0.6</string>
+	<string>0.6.1</string>
 	<key>webaddress</key>
 	<string>https://marius-schuller.de</string>
 </dict>

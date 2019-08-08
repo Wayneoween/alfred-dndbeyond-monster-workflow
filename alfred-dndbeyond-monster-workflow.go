@@ -39,8 +39,8 @@ var (
 	helpURL       = "https://github.com/" + repo
 	maxResults    = 50
 	doTranslateDE bool
-	includeSrc    = []string{"SRD", "PHB", "DMG", "DMG", "EEPC", "CoS", "GoS", "HotDQ", "MToF", "OotA", "PotA", "RoT", "SCAG", "SKT", "ToA", "VGM", "WDH", "WDMM", "BGDiA", "GGtR", "LMoP", "XGE", "TYP", "ESSENTIAL"}
-	srcString     = strings.Join(includeSrc, "&src=")
+	includeSrc    = []string{"SRD", "PHB", "DMG", "EEPC", "CoS", "GoS", "HotDQ", "MToF", "OotA", "PotA", "LMoP", "RoT", "SCAG", "SKT", "ToA", "VGM", "WDH", "WDMM", "BGDiA", "GGtR", "LMoP", "XGE", "TYP", "ESSENTIAL"}
+	excludeSrc    = []string{"AiME-SLH", "AiME-RRF", "AiME-SH", "CTHULHU", "D3", "STRANGE", "AiME-Wild"}
 
 	// commandline flags
 	doCheck     bool
@@ -57,9 +57,9 @@ func init() {
 
 	// start building the API URL to access
 	finalURL.WriteString(baseURL)
-	for _, src := range includeSrc {
+	for _, src := range excludeSrc {
 		// add all the sources
-		finalURL.WriteString("&src[]=")
+		finalURL.WriteString("&xsrc[]=")
 		finalURL.WriteString(src)
 	}
 	finalURL.WriteString("&q=")
