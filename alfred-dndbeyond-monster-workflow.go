@@ -261,7 +261,13 @@ func run() {
 					UID(temp.NameEN + temp.SingleLine).
 					Valid(true)
 			} else {
-				titleEN := fmt.Sprintf("%s", temp.NameEN)
+				// I need to remove the ( and ) from things like "Vampire (Warrior)"
+				// But Ogrillon or Kyton as well as "in lair" is still a problem.
+				// TODO: a function that removes special cases here.
+				tmpTitle := fmt.Sprintf("%s", temp.NameEN)
+				tmpTitle = strings.ReplaceAll(tmpTitle, "(", "")
+				tmpTitle = strings.ReplaceAll(tmpTitle, ")", "")
+				titleEN := tmpTitle
 				subtitleEN := fmt.Sprintf("CR %s - %s - %s - %s %s", temp.Cr, temp.Size, temp.Type, temp.Src, temp.PageEN)
 				wf.NewItem(titleEN).
 					Subtitle(subtitleEN).
