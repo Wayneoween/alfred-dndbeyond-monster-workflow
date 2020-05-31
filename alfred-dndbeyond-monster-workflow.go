@@ -39,8 +39,9 @@ var (
 	helpURL       = "https://github.com/" + repo
 	maxResults    = 50
 	doTranslateDE bool
-	includeSrc    = []string{"SRD", "PHB", "DMG", "EEPC", "CoS", "GoS", "HotDQ", "MToF", "OotA", "PotA", "LMoP", "RoT", "SCAG", "SKT", "ToA", "VGM", "WDH", "WDMM", "BGDiA", "GGtR", "LMoP", "XGE", "TYP", "ESSENTIAL"}
-	excludeSrc    = []string{"AiME-SLH", "AiME-RRF", "AiME-SH", "CTHULHU", "D3", "STRANGE", "AiME-Wild"}
+	// TODO: Load list of include and exclude sources from a file
+	includeSrc = []string{"SRD", "PHB", "DMG", "EEPC", "CoS", "GoS", "HotDQ", "MToF", "OotA", "PotA", "LMoP", "RoT", "SCAG", "SKT", "ToA", "VGM", "WDH", "WDMM", "BGDiA", "GGtR", "LMoP", "XGE", "TYP", "ESSENTIAL", "AI", "EBERRON", "EGtW", "DIP"}
+	excludeSrc = []string{"AiME-SLH", "AiME-RRF", "AiME-SH", "AiME-Wild", "AiME-RRF", "CTHULHU", "D3", "STRANGE", "AiME-Wild", "MARGREVE", "ToB", "CC"}
 
 	// commandline flags
 	doCheck     bool
@@ -54,7 +55,6 @@ var (
 )
 
 func init() {
-
 	// start building the API URL to access
 	finalURL.WriteString(baseURL)
 	for _, src := range excludeSrc {
@@ -201,10 +201,12 @@ func run() {
 				if len(result.Size) > 0 && len(result.Type) > 0 {
 					// add the result fields to temp Monster
 					temp := result
+					log.Println(result)
 
 					log.Println("MonsterCR:     ", temp.Cr)
 					log.Println("MonsterName:   ", temp.NameDE)
 					log.Println("MonsterType:   ", temp.Type)
+					log.Println("MonsterSrc:    ", temp.Src)
 					log.Println("MonsterSize:   ", temp.Size)
 					log.Println("-------------------------------------------------")
 
