@@ -326,6 +326,11 @@
 	<string>Changelog
 =========
 
+Version 0.6.2 – 2020-05-31
+------------------------
+
+No new bugfixes or features. Just an update of underlying dependencies.
+
 Version 0.6.1 – 2019-08-08
 ------------------------
 
@@ -475,7 +480,7 @@ Initial release \o/
 		<string>translate</string>
 	</array>
 	<key>version</key>
-	<string>0.6.1</string>
+	<string>0.6.2</string>
 	<key>webaddress</key>
 	<string>https://marius-schuller.de</string>
 </dict>
