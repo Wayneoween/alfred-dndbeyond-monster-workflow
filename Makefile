@@ -1,7 +1,5 @@
 all: clean build copy
 
-ZIP := $(shell which 7za)
-
 release: build gopack copy compress
 
 clean:
@@ -20,4 +18,4 @@ copy:
 	python2 workflow-install.py
 
 compress:
-	$(ZIP) a "workflow/D&DBeyond\ Monster\ Search.alfredworkflow" * -xr'!build' -xr'!.git' -xr'!demo.gif'
+	zip -r workflow/DnDBeyondMonsterSearch.alfredworkflow * -x build -x .git -x demo.gif
