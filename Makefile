@@ -1,6 +1,6 @@
-all: clean build copy
+all: clean build
 
-release: build gopack copy compress
+release: build gopack compress
 
 clean:
 	$(RM) alfred-dndbeyond-monster-workflow
@@ -13,9 +13,6 @@ build:
 
 gopack:
 	upx --brute alfred-dndbeyond-monster-workflow
-
-copy:
-	python2 workflow-install.py
 
 compress:
 	zip -r workflow/DnDBeyondMonsterSearch.alfredworkflow * -x build -x .git -x demo.gif
