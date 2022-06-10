@@ -33,4 +33,4 @@ jobs:
       with:
         # Directory containing the sources of the workflow
         workflow_dir: '.'
-        exclude_patterns: '*.go go.* *.sh *.gif'
+        exclude_patterns: '*.go go.* *.sh *.gif .git*'
