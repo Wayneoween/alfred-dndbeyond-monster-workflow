@@ -43,7 +43,7 @@ var (
 
 func getIconForType(monsterType string) *aw.Icon {
 
-	temp := new(aw.Icon)
+	var temp *aw.Icon
 
 	switch strings.ToLower(monsterType) {
 	case "aberration":
