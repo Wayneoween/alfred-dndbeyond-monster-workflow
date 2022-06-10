@@ -17,33 +17,8 @@ import (
 	"github.com/deanishe/awgo/update"
 )
 
-// Name of the background job that checks for updates
+// name of the background job that checks for updates
 const updateJobName = "checkForUpdate"
-
-// D3ResultSet mirrors the response from the dnddeutsch.de API
-type D3ResultSet struct {
-	O       string    `json:"o"`
-	V       float64   `json:"v"`
-	Monster []Monster `json:"monster"`
-}
-
-// Monster mirrors the response from the dnddeutsch.de API
-type Monster struct {
-	NameDE        string   `json:"name_de"`
-	NameDEUlisses string   `json:"name_de_ulisses"`
-	NameEN        string   `json:"name_en"`
-	PageDE        string   `json:"page_de"`
-	PageEN        string   `json:"page_en"`
-	Src           []string `json:"src"`
-	SrdName       string   `json:"srdname"`
-	Size          string   `json:"size"`
-	Type          string   `json:"type"`
-	Tags          string   `json:"tags"`
-	Alignment     string   `json:"alignment"`
-	Cr            string   `json:"cr"`
-	Xp            string   `json:"xp"`
-	SingleLine    string   `json:"singleline"`
-}
 
 var (
 	// awgo specific variable
@@ -51,117 +26,45 @@ var (
 
 	// base variables
 	query         string
-	finalURL      strings.Builder
-	baseURL       = "https://www.dnddeutsch.de/tools/json.php?apiv=0.7&o=monster"
+	baseURL       = "https://www.dnddeutsch.de/tools/json.php?apiv=0.7&o=monster&q="
+	repo          = "Wayneoween/alfred-dndbeyond-monster-workflow"
 	helpURL       = "https://github.com/" + repo
 	maxResults    = 20
 	doTranslateDE bool
-	includeSrc    = []string{
-		"AI",
-		"BGDiA",
-		"CM",
-		"CoS",
-		"CotN",
-		"DoIP",
-		"EBERRON",
-		"EGtW",
-		"FToD",
-		"GGtR",
-		"GoS",
-		"HotDQ",
-		"IDRotF",
-		"LMoP",
-		"MC1",
-		"MM",
-		"MMM",
-		"MOoT",
-		"MToF",
-		"OotA",
-		"PotA",
-		"RoT",
-		"SCC",
-		"SKT",
-		"SRD",
-		"TalDorei",
-		"TDR",
-		"ToA",
-		"TYP",
-		"VGM",
-		"VRGtR",
-		"WbtW",
-		"WDH",
-		"WDMM",
-	}
-	excludeSrc = []string{
-		"AiME-BRF",
-		"AiME-Eria",
-		"AiME-RIV",
-		"AiME-RRF",
-		"AiME-SLH",
-		"AiME-WdD",
-		"AiME-Wild",
-		"AVENT-M",
-		"AVENT-W",
-		"CC",
-		"CTH-GHOUL",
-		"CTHULHU",
-		"D3",
-		"MARGREVE",
-		"MTGAFR",
-		"Myth-AdDM",
-		"Myth-Held",
-		"Myth-Saga",
-		"RAGNAROK",
-		"STRANGE",
-		"ToB",
-		"ToB2",
-	}
 
-	// commandline flags
+	// possible commandline flags
 	doCheck     bool
 	doTranslate bool
-	// updateCheck target
-	repo = "Wayneoween/alfred-dndbeyond-monster-workflow" // GitHub repo
 
 	// cache variables
-	cacheName   = "monster_cache.json"       // Filename of cached repo list
-	maxCacheAge = 14 * 24 * 60 * time.Minute // Cache each query for 14 days
+	cacheName   = "cache.json"              // Filename of cached repo list
+	maxCacheAge = 7 * 24 * 60 * time.Minute // Cache each query for 14 days
 )
 
 func init() {
-	// start building the API URL to access
-	finalURL.WriteString(baseURL)
-
-	for _, src := range excludeSrc {
-		// add all the sources
-		finalURL.WriteString("&xsrc[]=")
-		finalURL.WriteString(src)
-	}
-	finalURL.WriteString("&q=")
-
-	// Create a new *Workflow using default configuration
-	// (workflow settings are read from the environment variables
-	// set by Alfred)
+	// create a new *Workflow using default configuration
+	// (workflow settings are read from the environment variables set by Alfred)
 	wf = aw.New(
 		aw.HelpURL(helpURL),
 		aw.MaxResults(maxResults),
 		update.GitHub(repo),
 	)
 
-	// Add a commandline flag to the binary so that the updateCheck can call it
+	// add a commandline flag to the binary so that updateCheck can call it
 	flag.BoolVar(&doCheck, "check", false, "check for a new version")
-	// Add a commandline flag to set the translation
+	// add a commandline flag to set the translation toggle
 	flag.BoolVar(&doTranslate, "translate", false, "toggle german translation")
 }
 
 func run() {
 	log.Println("DEBUG: Function 'run'!")
 
-	wf.Args() // call to handle magic actions
+	// call to handle any magic actions
+	wf.Args()
 	flag.Parse()
 
 	// handle the translation setting
-	doTranslateDE := wf.Config.GetBool("translate", false)
+	doTranslateDE = wf.Config.GetBool("translate", false)
 	log.Println("DEBUG: doTranslateDE=" + strconv.FormatBool(doTranslateDE))
 
 	if doTranslate {
@@ -181,6 +84,7 @@ func run() {
 		return
 	}
 
+	// collect the first word as only argument
 	if args := wf.Args(); len(args) > 0 {
 		query = args[0]
 	}
@@ -188,22 +92,22 @@ func run() {
 	log.Printf("[main] query=%s", query)
 	monsters := []*Monster{}
 
-	// Try to load cached monsters from $query_$cachename.json
+	// try to load cached monsters from $query_$cachename.json
 	if wf.Cache.Exists(query + "_" + cacheName) {
-		log.Println("Data is being loaded from cache.")
+		log.Println("DEBUG: data is being loaded from cache.")
 		if err := wf.Cache.LoadJSON(query+"_"+cacheName, &monsters); err != nil {
 			wf.FatalError(err)
 		}
-		log.Println("monsters after cache load: ", monsters)
+		log.Println("DEBUG: monsters loaded: ", len(monsters))
 	}
 
 	if wf.Cache.Expired(strings.Replace(query, " ", "-", -1)+"_"+cacheName, maxCacheAge) {
-		log.Println("Data is being loaded from website.")
+		log.Println("DEBUG: data is being loaded from website.")
 
 		var resultSet D3ResultSet
 
-		log.Println("Loading data from " + finalURL.String() + query)
-		response, err := http.Get(finalURL.String() + query)
+		log.Println("DEBUG: loading data from " + baseURL + query)
+		response, err := http.Get(baseURL + query)
 		if err != nil {
 			fmt.Print(err.Error())
 		}
@@ -215,7 +119,7 @@ func run() {
 			log.Fatal(err)
 		}
 
-		log.Printf("responseData: %s", responseData)
+		log.Printf("DEBUG: responseData: %s", responseData)
 
 		// unmarshall the JSON response into resultSet
 		json.Unmarshal(responseData, &resultSet)
@@ -228,33 +132,42 @@ func run() {
 			log.Printf("DEBUG: %d Monsters were found!", len(resultSet.Monster))
 
 			// range over the array and create entries for every one of them
-			log.Println("DEBUG: Printing each monster:")
+			log.Println("DEBUG: printing each monster:")
 			for _, result := range resultSet.Monster {
+
+				name := result.NameEN
+				if len(name) == 0 {
+					name = result.NameDE
+				}
+
+				if len(result.Src) > 0 {
+					if containsAny(excludeSrc, result.Src) {
+						log.Printf("DEBUG: skipped monster %s because of excluded source %s\n", name, result.Src)
+						continue
+					}
+				}
 
 				if len(result.Size) > 0 && len(result.Type) > 0 {
 					// add the result fields to temp Monster
 					temp := result
 
-					log.Println("MonsterCR:     ", temp.Cr)
-					log.Println("MonsterName:   ", temp.NameDE)
+					log.Println("MonsterName:   ", name)
 					log.Println("MonsterType:   ", temp.Type)
 					log.Println("MonsterSize:   ", temp.Size)
+					log.Println("MonsterCR:     ", temp.Cr)
 					log.Println("-------------------------------------------------")
 
 					monsters = append(monsters, &temp)
 				} else {
-					log.Println("Not a real monster entry. Skipping.")
+					log.Println("DEBUG: not a real monster entry. Skipping.")
 					log.Println(result)
 				}
 			}
 		}
 
-		// print the monster array
-		log.Println(monsters)
-
 		// write cache only if we have at least one monster
 		if len(monsters) != 0 {
-			log.Println("More than 1 monsters found. Caching...")
+			log.Println("DEBUG: more than 1 monsters found. Caching...")
 			wf.Configure(aw.TextErrors(true))
 			if err := wf.Cache.StoreJSON(strings.Replace(query, " ", "-", -1)+"_"+cacheName, monsters); err != nil {
 				wf.FatalError(err)
@@ -278,7 +191,7 @@ func run() {
 				var subtitleDE string
 				// if DE name and EN name are the same OR if DE name does not exist, use EN name
 				if temp.NameDE == temp.NameEN || len(temp.NameDE) == 0 {
-					titleDE = fmt.Sprintf("%s", temp.NameEN)
+					titleDE = temp.NameEN
 				} else {
 					titleDE = fmt.Sprintf("%s - %s", temp.NameDE, temp.NameEN)
 				}
@@ -294,10 +207,9 @@ func run() {
 					UID(temp.NameEN + temp.SingleLine).
 					Valid(true)
 			} else {
-				// I need to remove the ( and ) from things like "Vampire (Warrior)"
 				// But Ogrillon or Kyton as well as "in lair" is still a problem.
 				// TODO: a function that removes special cases here.
-				tmpTitle := fmt.Sprintf("%s", temp.NameEN)
+				tmpTitle := temp.NameEN
 				tmpTitle = strings.ReplaceAll(tmpTitle, "(", "")
 				tmpTitle = strings.ReplaceAll(tmpTitle, ")", "")
 				titleEN := tmpTitle
@@ -309,7 +221,6 @@ func run() {
 					UID(temp.NameEN + temp.SingleLine).
 					Valid(true)
 			}
-
 		}
 	}
 
@@ -319,6 +230,7 @@ func run() {
 		if err := wf.CheckForUpdate(); err != nil {
 			wf.FatalError(err)
 		}
+
 		return
 	}
 
