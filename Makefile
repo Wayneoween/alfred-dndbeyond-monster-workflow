@@ -10,7 +10,7 @@ clean:
 
 build:
 	echo "Building alfred-dndbeyond-monster-workflow..."
-	go build -ldflags="-s -w" alfred-dndbeyond-monster-workflow.go icons.go types.go helpers.go sources.go
+	go build -v -ldflags="-s -w" ./...
 
 gopack:
 	upx --brute alfred-dndbeyond-monster-workflow
