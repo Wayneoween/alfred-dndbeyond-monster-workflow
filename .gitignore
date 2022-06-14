@@ -1,5 +1,6 @@
 *.upx
 .DS_Store
-alfred_ddb
 alfred-dndbeyond-monster-workflow
+alfred_ddb
 testenv/*
+workflow/*

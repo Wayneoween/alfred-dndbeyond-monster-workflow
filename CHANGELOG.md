@@ -1,6 +1,23 @@
 Changelog
 =========
 
+Version 0.7.0 – 2022-06-14
+------------------------
+
+Small update. New go version and small fixes after long abandonment. A few updates with improvements should follow in the next months.
+
+Version 0.6.2 – 2020-05-31
+------------------------
+
+No new bugfixes or features. Just an update of underlying dependencies.
+
+Version 0.6.1 – 2019-08-08
+------------------------
+
+### Bugfix
+
+* Pin monster sources to the official WotC source books
+
 Version 0.6 – 2019-05-01
 ------------------------
 

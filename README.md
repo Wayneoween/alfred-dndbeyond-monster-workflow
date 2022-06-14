@@ -192,3 +192,9 @@ You can then use the cache to build a list of URLs to test if the renaming works
 ```bash
 for i in `cat testenv/cache/A_monster_cache.json |jq -r .[].name_en | tr 'A-Z' 'a-z' | tr ' ' '-'`; do echo https://www.dndbeyond.com/monsters/$i ;done
 ```
+
+To develop on osx you can use the shell script I copied from [here](https://github.com/lilyball/alfred-install-workflow) like this:
+
+```bash
+bash install-workflow.sh -v alfred-dndbeyond-monster-workflow icons
+```

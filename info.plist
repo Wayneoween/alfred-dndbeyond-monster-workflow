@@ -326,6 +326,11 @@
 	<string>Changelog
 =========
 
+Version 0.7.0 – 2022-06-14
+------------------------
+
+Small update. New go version and small fixes after long abandonment. A few updates with improvements should follow in the next months.
+
 Version 0.6.2 – 2020-05-31
 ------------------------
 
@@ -480,7 +485,7 @@ Initial release \o/
 		<string>translate</string>
 	</array>
 	<key>version</key>
-	<string>0.6.2</string>
+	<string>0.7.0</string>
 	<key>webaddress</key>
 	<string>https://marius-schuller.de</string>
 </dict>
