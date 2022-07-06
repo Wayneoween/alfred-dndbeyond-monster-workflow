@@ -56,14 +56,7 @@ func init() {
 	flag.BoolVar(&doTranslate, "translate", false, "toggle german translation")
 }
 
-func run() {
-	log.Println("DEBUG: Function 'run'!")
-
-	// call to handle any magic actions
-	wf.Args()
-	flag.Parse()
-
-	// handle the translation setting
+func toggleTranslate() {
 	doTranslateDE = wf.Config.GetBool("translate", false)
 	log.Println("DEBUG: doTranslateDE=" + strconv.FormatBool(doTranslateDE))
 
@@ -83,6 +76,17 @@ func run() {
 
 		return
 	}
+}
+
+func run() {
+	log.Println("DEBUG: Function 'run'!")
+
+	// call to handle any magic actions
+	wf.Args()
+	flag.Parse()
+
+	// handle the translation setting
+	toggleTranslate()
 
 	// collect the first word as only argument
 	if args := wf.Args(); len(args) > 0 {
@@ -150,6 +154,15 @@ func run() {
 				if len(result.Size) > 0 && len(result.Type) > 0 {
 					// add the result fields to temp Monster
 					temp := result
+
+					// only add the monster if the query string is contained in the name
+					// the API also returns entries where the query string is contained
+					// within the monster description and that is mixed german and english
+					if !strings.Contains(strings.ToLower(name), strings.ToLower(query)) {
+						log.Println("DEBUG: Monster name not containing search string. Skipping.")
+						log.Println(result)
+						continue
+					}
 
 					log.Println("MonsterName:   ", name)
 					log.Println("MonsterType:   ", temp.Type)
