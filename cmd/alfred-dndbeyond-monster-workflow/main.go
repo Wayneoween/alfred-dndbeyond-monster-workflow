@@ -15,6 +15,10 @@ import (
 
 	aw "github.com/deanishe/awgo"
 	"github.com/deanishe/awgo/update"
+
+	"github.com/Wayneoween/alfred-dndbeyond-monster-workflow/internal/icons"
+	"github.com/Wayneoween/alfred-dndbeyond-monster-workflow/internal/monster"
+	"github.com/Wayneoween/alfred-dndbeyond-monster-workflow/internal/sources"
 )
 
 // name of the background job that checks for updates
@@ -38,7 +42,7 @@ var (
 
 	// cache variables
 	cacheName   = "cache.json"              // Filename of cached repo list
-	maxCacheAge = 7 * 24 * 60 * time.Minute // Cache each query for 14 days
+	maxCacheAge = 7 * 24 * 60 * time.Minute // Cache each query for 7 days
 )
 
 func init() {
@@ -63,7 +67,7 @@ func toggleTranslate() {
 	if doTranslate {
 		log.Printf("Toggled translate from %s to %s.", strconv.FormatBool(doTranslateDE), strconv.FormatBool(!doTranslateDE))
 		wf.Configure(aw.TextErrors(true))
-		wf.NewItem(fmt.Sprintf("Set %s to “%s”", "translate", strconv.FormatBool(doTranslateDE))).
+		wf.NewItem(fmt.Sprintf("Set %s to \"%s\"", "translate", strconv.FormatBool(doTranslateDE))).
 			Subtitle("↩ to save").
 			Arg(strconv.FormatBool(doTranslateDE)).
 			Valid(true).
@@ -94,7 +98,7 @@ func run() {
 	}
 
 	log.Printf("[main] query=%s", query)
-	monsters := []*Monster{}
+	monsters := []*monster.Monster{}
 
 	// try to load cached monsters from $query_$cachename.json
 	if wf.Cache.Exists(query + "_" + cacheName) {
@@ -108,7 +112,7 @@ func run() {
 	if wf.Cache.Expired(strings.Replace(query, " ", "-", -1)+"_"+cacheName, maxCacheAge) {
 		log.Println("DEBUG: data is being loaded from website.")
 
-		var resultSet D3ResultSet
+		var resultSet monster.ResultSet
 
 		log.Println("DEBUG: loading data from " + baseURL + query)
 		response, err := http.Get(baseURL + query)
@@ -145,7 +149,7 @@ func run() {
 				}
 
 				if len(result.Src) > 0 {
-					if containsAny(excludeSrc, result.Src) {
+					if sources.ContainsAny(sources.ExcludedSources, result.Src) {
 						log.Printf("DEBUG: skipped monster %s because of excluded source %s\n", name, result.Src)
 						continue
 					}
@@ -215,7 +219,7 @@ func run() {
 				}
 				wf.NewItem(titleDE).
 					Subtitle(subtitleDE).
-					Icon(getIconForType(temp.Type)).
+					Icon(icons.ForType(temp.Type)).
 					Arg("https://www.dndbeyond.com/monsters/" + strings.Replace(strings.ToLower(temp.NameEN), " ", "-", -1)).
 					UID(temp.NameEN + temp.SingleLine).
 					Valid(true)
@@ -229,7 +233,7 @@ func run() {
 				subtitleEN := fmt.Sprintf("CR %s - %s - %s - %s %s", temp.Cr, temp.Size, temp.Type, temp.Src, temp.PageEN)
 				wf.NewItem(titleEN).
 					Subtitle(subtitleEN).
-					Icon(getIconForType(temp.Type)).
+					Icon(icons.ForType(temp.Type)).
 					Arg("https://www.dndbeyond.com/monsters/" + strings.Replace(strings.ToLower(temp.NameEN), " ", "-", -1)).
 					UID(temp.NameEN + temp.SingleLine).
 					Valid(true)
@@ -275,7 +279,7 @@ func run() {
 			Subtitle("↩ to install").
 			Autocomplete("workflow:update").
 			Valid(false).
-			Icon(UpdateAvailable)
+			Icon(icons.UpdateAvailable)
 	}
 
 	wf.WarnEmpty("No matching items", "Try a different query?")

@@ -48,6 +48,44 @@ help if you do a `ddb workflow:delcache` and try again.
 Development
 -----------
 
+### Project Structure
+
+This project follows 2026 Go best practices:
+
+```
+.
+├── cmd/
+│   └── alfred-dndbeyond-monster-workflow/  # Main application entry point
+│       └── main.go
+├── internal/                               # Internal packages (not importable externally)
+│   ├── icons/                              # Icon management for monster types
+│   ├── monster/                            # Monster data types and models
+│   └── sources/                            # Source book filtering
+├── go.mod                                  # Go module definition
+├── go.sum                                  # Go module checksums
+└── Makefile                                # Build automation
+```
+
+### Building
+
+```bash
+make build    # Build the binary
+make test     # Run tests
+make clean    # Clean build artifacts
+```
+
+### Testing
+
+The project includes comprehensive tests for all packages:
+
+```bash
+go test ./...                              # Run all tests
+go test -v ./internal/...                  # Run tests with verbose output
+go test -race -coverprofile=coverage.out ./...  # Run with race detector and coverage
+```
+
+### Development Environment
+
 To get a current list of all source books of monsters you can use `curl` and `jq` like so:
 
 ```bash
