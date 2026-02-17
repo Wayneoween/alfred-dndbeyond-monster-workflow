@@ -1,6 +1,8 @@
 D&DBeyond Workflow for [Alfred 3 and 4](http://www.alfredapp.com)
 ==============================
 
+[![Go CI](https://github.com/Wayneoween/alfred-dndbeyond-monster-workflow/actions/workflows/go.yml/badge.svg)](https://github.com/Wayneoween/alfred-dndbeyond-monster-workflow/actions/workflows/go.yml)
+
 You can search monsters on D&DBeyond (`ddb` in alfred).
 
 You don't need to login but you might end up on a monster page you can't see
