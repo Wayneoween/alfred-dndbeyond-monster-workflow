@@ -49,6 +49,9 @@ jobs:
 
     - name: Run tests
       run: go test -v -race -coverprofile=coverage.out -covermode=atomic ./...
+      # Note: continue-on-error is set because there are currently no test files
+      # This prevents the workflow from failing when tests are not present
+      # TODO: Remove this flag once tests are added to the codebase
       continue-on-error: true
 
   security:
@@ -66,7 +69,10 @@ jobs:
       run: go install github.com/securego/gosec/v2/cmd/gosec@latest
 
     - name: Run Gosec Security Scanner
-      run: gosec -exclude=G204,G702 -fmt=sarif -out=results.sarif ./... || true
+      # Exclude G204 and G702 as false positives (self-invocation via os.Args[0])
+      # continue-on-error allows security findings to be reported without failing the workflow
+      run: gosec -exclude=G204,G702 -fmt=sarif -out=results.sarif ./...
+      continue-on-error: true
 
     - name: Upload SARIF file
       uses: github/codeql-action/upload-sarif@v3
