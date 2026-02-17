@@ -4,3 +4,6 @@ alfred-dndbeyond-monster-workflow
 alfred_ddb
 testenv/*
 workflow/*
+coverage.out
+*.test
+*.prof
