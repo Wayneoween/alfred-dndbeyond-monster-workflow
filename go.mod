@@ -1,6 +1,6 @@
 module github.com/Wayneoween/alfred-dndbeyond-monster-workflow
 
-go 1.18
+go 1.23
 
 require github.com/deanishe/awgo v0.29.1
 

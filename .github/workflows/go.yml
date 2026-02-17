@@ -21,7 +21,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
-        go-version: '1.18'
+        go-version: '1.23'
 
     - name: Run gofmt
       run: |
@@ -36,7 +36,7 @@ jobs:
       run: go vet ./...
 
     - name: Install staticcheck
-      run: go install honnef.co/go/tools/cmd/staticcheck@v0.4.7
+      run: go install honnef.co/go/tools/cmd/staticcheck@latest
 
     - name: Run staticcheck
       run: staticcheck ./...
@@ -52,7 +52,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
-        go-version: '1.18'
+        go-version: '1.23'
 
     - name: Run tests
       run: go test -v -race -coverprofile=coverage.out -covermode=atomic ./...
@@ -73,10 +73,10 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
-        go-version: '1.18'
+        go-version: '1.23'
 
     - name: Install gosec
-      run: go install github.com/securego/gosec/v2/cmd/gosec@v2.18.2
+      run: go install github.com/securego/gosec/v2/cmd/gosec@latest
 
     - name: Run Gosec Security Scanner
       # Exclude G204 and G702 as false positives (self-invocation via os.Args[0])
@@ -102,7 +102,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
-        go-version: '1.18'
+        go-version: '1.23'
 
     - name: Verify Go modules
       run: |
