@@ -85,7 +85,7 @@ jobs:
       continue-on-error: true
 
     - name: Upload SARIF file
-      uses: github/codeql-action/upload-sarif@v3
+      uses: github/codeql-action/upload-sarif@v4
       if: always()
       with:
         sarif_file: results.sarif
@@ -115,7 +115,7 @@ jobs:
     - name: Compress binaries
       uses: svenstaro/upx-action@v2
       with:
-        file: alfred-dndbeyond-monster-workflow
+        files: alfred-dndbeyond-monster-workflow
 
     - name: Build an Alfred Workflow
       uses: almibarss/build-alfred-workflow@v1.0.1
