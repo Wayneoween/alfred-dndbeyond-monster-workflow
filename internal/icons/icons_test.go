@@ -1,4 +1,4 @@
-package main
+package icons
 
 import (
 	"testing"
@@ -6,7 +6,7 @@ import (
 	aw "github.com/deanishe/awgo"
 )
 
-func TestGetIconForType(t *testing.T) {
+func TestForType(t *testing.T) {
 	tests := []struct {
 		name         string
 		monsterType  string
@@ -15,105 +15,105 @@ func TestGetIconForType(t *testing.T) {
 		{
 			name:         "aberration lowercase",
 			monsterType:  "aberration",
-			expectedIcon: MonsterIconAbberations,
+			expectedIcon: Aberrations,
 		},
 		{
 			name:         "aberration uppercase",
 			monsterType:  "ABERRATION",
-			expectedIcon: MonsterIconAbberations,
+			expectedIcon: Aberrations,
 		},
 		{
 			name:         "aberration mixed case",
 			monsterType:  "ABeRrAtIoN",
-			expectedIcon: MonsterIconAbberations,
+			expectedIcon: Aberrations,
 		},
 		{
 			name:         "beast",
 			monsterType:  "beast",
-			expectedIcon: MonsterIconBeasts,
+			expectedIcon: Beasts,
 		},
 		{
 			name:         "celestial",
 			monsterType:  "celestial",
-			expectedIcon: MonsterIconCelestials,
+			expectedIcon: Celestials,
 		},
 		{
 			name:         "construct",
 			monsterType:  "construct",
-			expectedIcon: MonsterIconConstructs,
+			expectedIcon: Constructs,
 		},
 		{
 			name:         "dragon",
 			monsterType:  "dragon",
-			expectedIcon: MonsterIconDragons,
+			expectedIcon: Dragons,
 		},
 		{
 			name:         "elemental",
 			monsterType:  "elemental",
-			expectedIcon: MonsterIconElementals,
+			expectedIcon: Elementals,
 		},
 		{
 			name:         "fey",
 			monsterType:  "fey",
-			expectedIcon: MonsterIconFey,
+			expectedIcon: Fey,
 		},
 		{
 			name:         "fiend",
 			monsterType:  "fiend",
-			expectedIcon: MonsterIconFiends,
+			expectedIcon: Fiends,
 		},
 		{
 			name:         "giant",
 			monsterType:  "giant",
-			expectedIcon: MonsterIconGiants,
+			expectedIcon: Giants,
 		},
 		{
 			name:         "humanoid",
 			monsterType:  "humanoid",
-			expectedIcon: MonsterIconHumanoids,
+			expectedIcon: Humanoids,
 		},
 		{
 			name:         "monstrosity",
 			monsterType:  "monstrosity",
-			expectedIcon: MonsterIconMonstrosities,
+			expectedIcon: Monstrosities,
 		},
 		{
 			name:         "ooze",
 			monsterType:  "ooze",
-			expectedIcon: MonsterIconOozes,
+			expectedIcon: Oozes,
 		},
 		{
 			name:         "plant",
 			monsterType:  "plant",
-			expectedIcon: MonsterIconPlants,
+			expectedIcon: Plants,
 		},
 		{
 			name:         "undead",
 			monsterType:  "undead",
-			expectedIcon: MonsterIconUndead,
+			expectedIcon: Undead,
 		},
 		{
 			name:         "unknown type returns default",
 			monsterType:  "unknown",
-			expectedIcon: MonsterIconDefault,
+			expectedIcon: Default,
 		},
 		{
 			name:         "empty string returns default",
 			monsterType:  "",
-			expectedIcon: MonsterIconDefault,
+			expectedIcon: Default,
 		},
 		{
 			name:         "swarm returns default",
 			monsterType:  "swarm",
-			expectedIcon: MonsterIconDefault,
+			expectedIcon: Default,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := getIconForType(tt.monsterType)
+			result := ForType(tt.monsterType)
 			if result != tt.expectedIcon {
-				t.Errorf("getIconForType(%q) = %v; want %v", tt.monsterType, result, tt.expectedIcon)
+				t.Errorf("ForType(%q) = %v; want %v", tt.monsterType, result, tt.expectedIcon)
 			}
 		})
 	}
@@ -121,22 +121,22 @@ func TestGetIconForType(t *testing.T) {
 
 func TestIconsExist(t *testing.T) {
 	icons := map[string]*aw.Icon{
-		"UpdateAvailable":        UpdateAvailable,
-		"MonsterIconDefault":     MonsterIconDefault,
-		"MonsterIconAbberations": MonsterIconAbberations,
-		"MonsterIconBeasts":      MonsterIconBeasts,
-		"MonsterIconCelestials":  MonsterIconCelestials,
-		"MonsterIconConstructs":  MonsterIconConstructs,
-		"MonsterIconDragons":     MonsterIconDragons,
-		"MonsterIconElementals":  MonsterIconElementals,
-		"MonsterIconFey":         MonsterIconFey,
-		"MonsterIconFiends":      MonsterIconFiends,
-		"MonsterIconGiants":      MonsterIconGiants,
-		"MonsterIconHumanoids":   MonsterIconHumanoids,
-		"MonsterIconMonstrosities": MonsterIconMonstrosities,
-		"MonsterIconOozes":       MonsterIconOozes,
-		"MonsterIconPlants":      MonsterIconPlants,
-		"MonsterIconUndead":      MonsterIconUndead,
+		"UpdateAvailable": UpdateAvailable,
+		"Default":         Default,
+		"Aberrations":     Aberrations,
+		"Beasts":          Beasts,
+		"Celestials":      Celestials,
+		"Constructs":      Constructs,
+		"Dragons":         Dragons,
+		"Elementals":      Elementals,
+		"Fey":             Fey,
+		"Fiends":          Fiends,
+		"Giants":          Giants,
+		"Humanoids":       Humanoids,
+		"Monstrosities":   Monstrosities,
+		"Oozes":           Oozes,
+		"Plants":          Plants,
+		"Undead":          Undead,
 	}
 
 	for name, icon := range icons {

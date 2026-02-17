@@ -1,13 +1,14 @@
-package main
+// Package monster provides data types and models for D&D monster information.
+package monster
 
-// D3ResultSet mirrors the response from the dnddeutsch.de API
-type D3ResultSet struct {
+// ResultSet mirrors the response from the dnddeutsch.de API
+type ResultSet struct {
 	O       string    `json:"o"`
 	V       float64   `json:"v"`
 	Monster []Monster `json:"monster"`
 }
 
-// monster mirrors the response from the dnddeutsch.de API
+// Monster represents a D&D monster with all its attributes
 type Monster struct {
 	NameDE        string   `json:"name_de"`
 	NameDEUlisses string   `json:"name_de_ulisses"`

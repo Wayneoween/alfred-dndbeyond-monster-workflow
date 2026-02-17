@@ -1,4 +1,4 @@
-package main
+package monster
 
 import (
 	"encoding/json"
@@ -57,8 +57,8 @@ func TestMonsterJSONMarshaling(t *testing.T) {
 	}
 }
 
-func TestD3ResultSetJSONMarshaling(t *testing.T) {
-	resultSet := D3ResultSet{
+func TestResultSetJSONMarshaling(t *testing.T) {
+	resultSet := ResultSet{
 		O: "monster",
 		V: 0.7,
 		Monster: []Monster{
@@ -84,7 +84,7 @@ func TestD3ResultSetJSONMarshaling(t *testing.T) {
 	}
 
 	// Test unmarshaling
-	var unmarshaled D3ResultSet
+	var unmarshaled ResultSet
 	err = json.Unmarshal(data, &unmarshaled)
 	if err != nil {
 		t.Fatalf("Failed to unmarshal resultSet: %v", err)

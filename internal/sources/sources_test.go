@@ -1,6 +1,56 @@
-package main
+package sources
 
 import "testing"
+
+func TestExcludedSourcesList(t *testing.T) {
+	expectedExcluded := []string{
+		"AiME-BRF",
+		"AiME-Eria",
+		"AiME-RIV",
+		"AiME-RRF",
+		"AiME-SLH",
+		"AiME-WdD",
+		"AiME-Wild",
+		"AVENT-M",
+		"AVENT-W",
+		"CC",
+		"CTH-GHOUL",
+		"CTHULHU",
+		"D3",
+		"MARGREVE",
+		"MTGAFR",
+		"Myth-AdDM",
+		"Myth-Held",
+		"Myth-Saga",
+		"RAGNAROK",
+		"STRANGE",
+		"ToB",
+		"ToB2",
+	}
+
+	if len(ExcludedSources) != len(expectedExcluded) {
+		t.Errorf("ExcludedSources length = %d; want %d", len(ExcludedSources), len(expectedExcluded))
+	}
+
+	// Create a map for quick lookup
+	excludeMap := make(map[string]bool)
+	for _, src := range ExcludedSources {
+		excludeMap[src] = true
+	}
+
+	// Check all expected sources are in the exclude list
+	for _, expected := range expectedExcluded {
+		if !excludeMap[expected] {
+			t.Errorf("Expected source %q not found in ExcludedSources", expected)
+		}
+	}
+}
+
+func TestExcludedSourcesNotEmpty(t *testing.T) {
+	if len(ExcludedSources) == 0 {
+		t.Error("ExcludedSources should not be empty")
+	}
+}
 
 func TestContainsAny(t *testing.T) {
 	tests := []struct {
@@ -79,9 +129,9 @@ func TestContainsAny(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := containsAny(tt.listA, tt.listB)
+			result := ContainsAny(tt.listA, tt.listB)
 			if result != tt.expect {
-				t.Errorf("containsAny(%v, %v) = %v; want %v", tt.listA, tt.listB, result, tt.expect)
+				t.Errorf("ContainsAny(%v, %v) = %v; want %v", tt.listA, tt.listB, result, tt.expect)
 			}
 		})
 	}
